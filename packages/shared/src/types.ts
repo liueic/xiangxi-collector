@@ -36,3 +36,61 @@ export interface NextParagraphResponse {
   paragraph: Paragraph;
   progress: PromptProgress;
 }
+
+export type HeatmapType = 'rusheng' | 'zhuzhuang' | 'dialect' | 'normal';
+
+export interface HeatmapData {
+  index: number;
+  char: string;
+  type: HeatmapType;
+  intensity: number;
+}
+
+export interface PhoneticAnalysis {
+  charCount: number;
+  rushengCount: number;
+  rushengDensity: number;
+  zhuzhuangCount: number;
+  dialectWords: string[];
+  score: number;
+  features: string[];
+}
+
+export interface GeneratedSentence {
+  id: string;
+  text: string;
+  features?: string[];
+  analysis: PhoneticAnalysis;
+  heatmap: HeatmapData[];
+  status: 'pending' | 'approved' | 'rejected';
+  topic?: string;
+  difficulty?: Difficulty;
+}
+
+export interface GenerationRequest {
+  endpoint: string;
+  apiKey: string;
+  model: string;
+  topic: string;
+  difficulty: Difficulty;
+  count: number;
+  specificFeatures?: string[];
+}
+
+export interface GenerationResponse {
+  success: boolean;
+  data: GeneratedSentence[];
+  summary: {
+    total: number;
+    highQuality: number;
+    avgRushengDensity: number;
+  };
+}
+
+export interface ApproveRequest {
+  ids: string[];
+}
+
+export interface ApproveResponse {
+  approved: number;
+}

@@ -15,7 +15,7 @@ const corporaDir = resolve(process.cwd(), '../../corpora');
 export function loadCorporaToDb() {
   const files = readdirSync(corporaDir).filter((f) => f.endsWith('.json'));
   const insert = db.prepare(
-    'INSERT OR IGNORE INTO corpora (id, title, content, category, difficulty_score) VALUES (?, ?, ?, ?, ?)'
+    'INSERT OR IGNORE INTO corpora (id, title, content, category, difficulty_score, source) VALUES (?, ?, ?, ?, ?, ?)'
   );
 
   for (const file of files) {
@@ -23,7 +23,7 @@ export function loadCorporaToDb() {
     const raw = JSON.parse(readFileSync(resolve(corporaDir, file), 'utf-8')) as CorporaEntry[];
     for (const entry of raw) {
       const difficultyScore = entry.difficulty === 'hard' ? 3 : entry.difficulty === 'medium' ? 2 : 1;
-      insert.run(entry.id, category, entry.content, category, difficultyScore);
+      insert.run(entry.id, category, entry.content, category, difficultyScore, 'local');
     }
   }
 }

@@ -13,7 +13,8 @@ db.exec(`
     title TEXT,
     content TEXT,
     category TEXT,
-    difficulty_score INTEGER
+    difficulty_score INTEGER,
+    source TEXT
   );
 
   CREATE TABLE IF NOT EXISTS recordings (
@@ -40,10 +41,26 @@ db.exec(`
     birth_year INTEGER,
     language_background TEXT
   );
+
+  CREATE TABLE IF NOT EXISTS generated_corpus (
+    id TEXT PRIMARY KEY,
+    text TEXT,
+    topic TEXT,
+    difficulty TEXT,
+    analysis_json TEXT,
+    status TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
 `);
 
 const recordingColumns = db.prepare(`PRAGMA table_info(recordings);`).all() as { name: string }[];
 const recordingColumnNames = new Set(recordingColumns.map((c) => c.name));
 if (!recordingColumnNames.has('processed_path')) {
   db.exec('ALTER TABLE recordings ADD COLUMN processed_path TEXT;');
+}
+
+const corporaColumns = db.prepare(`PRAGMA table_info(corpora);`).all() as { name: string }[];
+const corporaColumnNames = new Set(corporaColumns.map((c) => c.name));
+if (!corporaColumnNames.has('source')) {
+  db.exec('ALTER TABLE corpora ADD COLUMN source TEXT;');
 }

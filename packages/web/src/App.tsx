@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import type { NextParagraphResponse, UploadResponse } from '@xiangxi/shared';
 import PromptReader from './components/PromptReader';
 import WaveformVisualizer from './components/WaveformVisualizer';
+import CorpusGenerator from './components/CorpusGenerator';
 import { useRecorder } from './hooks/useRecorder';
 import { useAudioAnalysis } from './hooks/useAudioAnalysis';
 
@@ -175,6 +176,8 @@ export default function App() {
           </div>
         ) : null}
       </div>
+
+      <CorpusGenerator />
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { resolve } from 'node:path';
 import { corporaRoutes } from './routes/corpora.js';
 import { recordingsRoutes } from './routes/recordings.js';
 import { datasetRoutes } from './routes/dataset.js';
+import { corpusRoutes } from './routes/corpus.js';
 import { loadCorporaToDb } from './services/CorporaService.js';
 
 const app = Fastify({ logger: true });
@@ -24,6 +25,7 @@ loadCorporaToDb();
 await app.register(corporaRoutes);
 await app.register(recordingsRoutes);
 await app.register(datasetRoutes);
+await app.register(corpusRoutes);
 
 app.get('/api/health', async () => ({ ok: true }));
 
