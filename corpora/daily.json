@@ -1,0 +1,17 @@
+[
+  {
+    "id": "daily_001",
+    "content": "今朝天气好，我俚去街上买菜。",
+    "difficulty": "easy"
+  },
+  {
+    "id": "daily_002",
+    "content": "你吃饭未？若未吃，来屋里坐哈。",
+    "difficulty": "easy"
+  },
+  {
+    "id": "daily_003",
+    "content": "河边风大，走路要慢慢来。",
+    "difficulty": "medium"
+  }
+]

@@ -1,0 +1,27 @@
+{
+  "name": "@xiangxi/server",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon",
+    "start": "node dist/index.js",
+    "build": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@fastify/multipart": "^8.0.0",
+    "@fastify/static": "^7.0.0",
+    "@xiangxi/shared": "*",
+    "better-sqlite3": "^9.4.5",
+    "fastify": "^4.27.0",
+    "archiver": "^6.0.1",
+    "fluent-ffmpeg": "^2.1.2",
+    "ffmpeg-static": "^5.2.0",
+    "nanoid": "^5.0.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.5.4",
+    "nodemon": "^3.1.7",
+    "tsx": "^4.17.0",
+    "typescript": "^5.5.4"
+  }
+}

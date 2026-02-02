@@ -1,0 +1,17 @@
+{
+  "name": "xiangxi-collector",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:web\"",
+    "dev:web": "npm --workspace @xiangxi/web run dev",
+    "dev:server": "npm --workspace @xiangxi/server run dev",
+    "build": "npm --workspace @xiangxi/web run build",
+    "lint": "echo \"No lint configured\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
