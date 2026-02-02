@@ -3,7 +3,7 @@ import { createWriteStream, mkdirSync } from 'node:fs';
 import { pipeline } from 'node:stream/promises';
 import { resolve } from 'node:path';
 import { nanoid } from 'nanoid';
-import type { UploadResponse } from '@xiangxi/shared';
+import type { RecordingListResponse, UploadResponse } from '@xiangxi/shared';
 import { db } from '../db.js';
 import { analyzeAudio, getFileSizeKb, standardizeAudio } from '../services/AudioProcessor.js';
 
@@ -98,5 +98,39 @@ export async function recordingsRoutes(app: FastifyInstance) {
       return { error: 'not found' };
     }
     return reply.sendFile(row.file_path);
+  });
+
+  app.get<{ Querystring: { limit?: string } }>('/api/recordings/list', async (request) => {
+    const limit = Math.min(Number(request.query.limit ?? 100), 500);
+    const totalRow = db.prepare('SELECT COUNT(*) as cnt FROM recordings').get() as { cnt: number };
+    const rows = db
+      .prepare(
+        `SELECT r.id, r.paragraph_id, r.speaker_id, r.status, r.created_at, c.content as paragraph_content
+         FROM recordings r
+         LEFT JOIN corpora c ON r.paragraph_id = c.id
+         ORDER BY datetime(r.created_at) DESC, r.id DESC
+         LIMIT ?`
+      )
+      .all(limit) as {
+      id: string;
+      paragraph_id: string;
+      speaker_id: string | null;
+      status: string | null;
+      created_at: string | null;
+      paragraph_content: string | null;
+    }[];
+
+    const payload: RecordingListResponse = {
+      total: totalRow?.cnt ?? rows.length,
+      items: rows.map((row) => ({
+        id: row.id,
+        paragraphId: row.paragraph_id,
+        paragraphContent: row.paragraph_content,
+        speakerId: row.speaker_id,
+        status: row.status,
+        createdAt: row.created_at
+      }))
+    };
+    return payload;
   });
 }

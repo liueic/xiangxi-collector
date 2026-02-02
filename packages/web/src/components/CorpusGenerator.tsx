@@ -40,6 +40,7 @@ export default function CorpusGenerator() {
   const [difficulty, setDifficulty] = useState<Difficulty>('hard');
   const [count, setCount] = useState(8);
   const [featureText, setFeatureText] = useState('入声');
+  const [autoApprove, setAutoApprove] = useState(true);
   const [candidates, setCandidates] = useState<GeneratedSentence[]>([]);
   const [status, setStatus] = useState('');
   const [loading, setLoading] = useState(false);
@@ -79,7 +80,8 @@ export default function CorpusGenerator() {
         topic,
         difficulty,
         count,
-        specificFeatures: featureList
+        specificFeatures: featureList,
+        autoApprove
       })
     });
 
@@ -203,6 +205,15 @@ export default function CorpusGenerator() {
             placeholder="入声,知组字"
           />
         </div>
+        <label className="input-row">
+          <span>自动入库</span>
+          <input
+            type="checkbox"
+            checked={autoApprove}
+            onChange={(event) => setAutoApprove(event.target.checked)}
+          />
+          <span className="status">{autoApprove ? '已开启' : '关闭'}</span>
+        </label>
       </div>
 
       <div className="controls" style={{ marginTop: 12 }}>

@@ -75,6 +75,7 @@ export interface GenerationRequest {
   difficulty: Difficulty;
   count: number;
   specificFeatures?: string[];
+  autoApprove?: boolean;
 }
 
 export interface GenerationResponse {
@@ -93,4 +94,32 @@ export interface ApproveRequest {
 
 export interface ApproveResponse {
   approved: number;
+}
+
+export interface CorpusListItem {
+  id: string;
+  content: string;
+  category: string | null;
+  difficultyScore: number | null;
+  source: string | null;
+  createdAt: string | null;
+}
+
+export interface CorpusListResponse {
+  total: number;
+  items: CorpusListItem[];
+}
+
+export interface RecordingListItem {
+  id: string;
+  paragraphId: string;
+  paragraphContent: string | null;
+  speakerId: string | null;
+  status: string | null;
+  createdAt: string | null;
+}
+
+export interface RecordingListResponse {
+  total: number;
+  items: RecordingListItem[];
 }

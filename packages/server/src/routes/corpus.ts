@@ -53,7 +53,16 @@ const extractJson = (content: string) => {
 
 export async function corpusRoutes(app: FastifyInstance) {
   app.post<{ Body: GenerationRequest }>('/api/corpus/generate', async (request, reply) => {
-    const { endpoint, apiKey, model, topic, difficulty, count, specificFeatures } = request.body;
+    const {
+      endpoint,
+      apiKey,
+      model,
+      topic,
+      difficulty,
+      count,
+      specificFeatures,
+      autoApprove = true
+    } = request.body;
     if (!endpoint || !model) {
       reply.status(400);
       return { error: '缺少 endpoint / model' };
@@ -122,16 +131,33 @@ export async function corpusRoutes(app: FastifyInstance) {
     const insert = db.prepare(
       'INSERT INTO generated_corpus (id, text, topic, difficulty, analysis_json, status) VALUES (?, ?, ?, ?, ?, ?)'
     );
+    const insertCorpus = db.prepare(
+      'INSERT OR REPLACE INTO corpora (id, title, content, category, difficulty_score, source) VALUES (?, ?, ?, ?, ?, ?)'
+    );
     const insertMany = db.transaction((rows: GeneratedSentence[]) => {
       for (const row of rows) {
+        const status = autoApprove ? 'approved' : row.status;
         insert.run(
           row.id,
           row.text,
           row.topic ?? topic,
           row.difficulty ?? difficulty,
           JSON.stringify(row.analysis),
-          row.status
+          status
         );
+        if (autoApprove) {
+          const difficultyScore =
+            row.difficulty === 'hard' ? 3 : row.difficulty === 'medium' ? 2 : 1;
+          insertCorpus.run(
+            row.id,
+            row.topic ?? topic,
+            row.text,
+            row.topic ?? topic,
+            difficultyScore,
+            'llm_generated'
+          );
+          row.status = 'approved';
+        }
       }
     });
     insertMany(analyzed);

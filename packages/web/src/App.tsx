@@ -3,6 +3,8 @@ import type { NextParagraphResponse, UploadResponse } from '@xiangxi/shared';
 import PromptReader from './components/PromptReader';
 import WaveformVisualizer from './components/WaveformVisualizer';
 import CorpusGenerator from './components/CorpusGenerator';
+import CorpusLibrary from './components/CorpusLibrary';
+import RecordingLog from './components/RecordingLog';
 import { useRecorder } from './hooks/useRecorder';
 import { useAudioAnalysis } from './hooks/useAudioAnalysis';
 
@@ -15,6 +17,7 @@ export default function App() {
   const [lastMetrics, setLastMetrics] = useState<UploadResponse['metrics'] | null>(null);
   const [fontSize, setFontSize] = useState(22);
   const [lineHeight, setLineHeight] = useState(1.9);
+  const [countdown, setCountdown] = useState<number | null>(null);
 
   const recorder = useRecorder();
   const analysis = useAudioAnalysis(recorder.stream);
@@ -70,6 +73,32 @@ export default function App() {
     recorder.reset();
     await loadNext();
     setUploading(false);
+    setCountdown(2);
+    setStatus('上传完成，准备开始下一段...');
+    const timer = window.setInterval(() => {
+      setCountdown((prev) => {
+        if (prev === null) return null;
+        if (prev <= 1) {
+          window.clearInterval(timer);
+          setStatus('开始录音...');
+          recorder.start();
+          return null;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
+  const handleStart = async () => {
+    if (recorder.isRecording) return;
+    recorder.reset();
+    setStatus('准备录音...');
+    try {
+      await loadNext();
+    } catch {
+      setStatus('获取语料失败');
+    }
+    recorder.start();
   };
 
   const handleExport = async () => {
@@ -98,7 +127,7 @@ export default function App() {
         </div>
         <PromptReader paragraph={paragraph} fontSize={fontSize} lineHeight={lineHeight} />
         <div className="controls">
-          <button className="primary" onClick={recorder.start} disabled={recorder.isRecording}>
+          <button className="primary" onClick={handleStart} disabled={recorder.isRecording}>
             开始录音
           </button>
           <button className="secondary" onClick={recorder.stop} disabled={!recorder.isRecording}>
@@ -116,7 +145,9 @@ export default function App() {
             <audio controls src={playbackUrl} />
           </div>
         ) : null}
-        <div className="status">{status || '准备就绪'}</div>
+        <div className="status">
+          {countdown !== null ? `倒计时 ${countdown}s` : status || '准备就绪'}
+        </div>
       </div>
 
       <div className="card">
@@ -178,6 +209,8 @@ export default function App() {
       </div>
 
       <CorpusGenerator />
+      <CorpusLibrary />
+      <RecordingLog />
     </div>
   );
 }

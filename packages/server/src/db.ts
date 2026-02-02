@@ -14,7 +14,8 @@ db.exec(`
     content TEXT,
     category TEXT,
     difficulty_score INTEGER,
-    source TEXT
+    source TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 
   CREATE TABLE IF NOT EXISTS recordings (
@@ -63,4 +64,7 @@ const corporaColumns = db.prepare(`PRAGMA table_info(corpora);`).all() as { name
 const corporaColumnNames = new Set(corporaColumns.map((c) => c.name));
 if (!corporaColumnNames.has('source')) {
   db.exec('ALTER TABLE corpora ADD COLUMN source TEXT;');
+}
+if (!corporaColumnNames.has('created_at')) {
+  db.exec('ALTER TABLE corpora ADD COLUMN created_at DATETIME;');
 }
